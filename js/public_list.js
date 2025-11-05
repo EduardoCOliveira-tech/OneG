@@ -1,7 +1,7 @@
 // js/public_list.js
 
 // URL da API (deve ser o caminho completo)
-const API_URL = 'http://localhost:5000/api'; 
+const API_URL = 'https://oneg-6x4j.onrender.com'; 
 
 // Variáveis globais
 let items = [];
@@ -156,4 +156,5 @@ function populateMangaFilters() {
         option1.textContent = manga;
         mangaFilter.appendChild(option1);
     });
+
 }
