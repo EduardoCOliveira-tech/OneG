@@ -291,7 +291,6 @@ function logout(e) {
 
 // --- NOVAS FUNÇÕES DE TEMA (MODO ESCURO) ---
 
-// Aplica o tema salvo ao carregar a página
 function applyTheme() {
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'dark') {
@@ -303,7 +302,6 @@ function applyTheme() {
     }
 }
 
-// Alterna o tema e salva a preferência
 function toggleTheme() {
     if (darkModeToggle.checked) {
         document.body.classList.add('dark-mode');
@@ -407,7 +405,6 @@ async function handleEditProfile(e) {
     }
 }
 
-// *** FUNÇÃO DE UPLOAD COM REDIMENSIONAMENTO ***
 function handleImageFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -431,7 +428,6 @@ function handleImageFileSelect(e) {
             let width = img.width;
             let height = img.height;
 
-            // 4. Calcular novas dimensões mantendo a proporção
             if (width > height) {
                 if (width > MAX_WIDTH) {
                     height = height * (MAX_WIDTH / width);
@@ -444,21 +440,17 @@ function handleImageFileSelect(e) {
                 }
             }
 
-            // 5. Desenhar a imagem redimensionada em um <canvas>
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
 
-            // 6. Extrair a nova imagem como Data URL (base64)
             const dataUrl = canvas.toDataURL('image/jpeg', 0.9); 
 
-            // 7. Mostrar o preview e salvar a string no input escondido
             profilePicPreview.src = dataUrl;
             profilePictureStringInput.value = dataUrl; 
             
-            // 8. Esconder feedback
             uploadStatus.classList.add('hidden');
         }
     };
@@ -469,13 +461,13 @@ function handleImageFileSelect(e) {
         uploadStatus.classList.add('hidden');
     };
 
-    // 9. Iniciar a leitura do arquivo
     reader.readAsDataURL(file);
 }
 
 
 // --- Funções de Requisição (Fetch) ---
 
+// ******* FUNÇÃO CORRIGIDA *******
 async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -491,7 +483,17 @@ async function fetchWithAuth(url, options = {}) {
 
     try {
         const response = await fetch(url, { ...options, headers });
+
+        // --- INÍCIO DA CORREÇÃO ---
+        // Verifica o status ANTES de tentar ler o JSON.
+        // O status 204 (No Content) é um sucesso, mas não tem corpo.
+        if (response.status === 204) {
+            return null; // Retorna nulo, que é um sucesso "vazio"
+        }
+
+        // Agora é seguro ler o JSON
         const data = await response.json();
+        // --- FIM DA CORREÇÃO ---
 
         if (!response.ok) {
             if (response.status === 401) {
@@ -502,11 +504,14 @@ async function fetchWithAuth(url, options = {}) {
         return data;
     } catch (error) {
         if (error instanceof SyntaxError) {
+             // Este erro agora só deve acontecer se o servidor enviar um 500 com HTML
              throw new Error("Erro de comunicação com o servidor.");
         }
         throw error;
     }
 }
+// ******* FIM DA FUNÇÃO CORRIGIDA *******
+
 
 // --- Funções da Lista (CRUD, Render, Filtros) ---
 // (O restante do seu código JS continua aqui, sem alterações)
