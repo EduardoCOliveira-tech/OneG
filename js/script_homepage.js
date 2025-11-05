@@ -30,7 +30,7 @@ const toggleDropdown = (dropdown, menu, isOpen) => {
 
 /* === PARTE 2: NOVA LÓGICA DE FUNCIONALIDADES (Lista de Presentes, Perfil, etc.) === */
 
-const API_URL = 'http://localhost:5000/api'; 
+const API_URL = 'https://oneg-6x4j.onrender.com'; 
 const DEFAULT_PROFILE_PIC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi42NiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+';
 
 let items = [];
