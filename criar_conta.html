@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Smart Wall: Criar Conta</title>
+        <link rel="stylesheet" href="css/criar_conta.css">
+        <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+    </head>
+    <body>
+        <main>
+            <div class="wrapper">
+                <form id="register-form">
+                    <h2>Criar Conta</h2>
+                        
+                        <div class="entrada">
+                        <input type="text" id="username" required>
+                        <label>Crie um nome de usuário</label>
+                    </div>
+                    
+                    <div class="entrada">
+                        <input type="email" id="email" required>
+                        <label>Digite seu email</label>
+                    </div>
+                    <div class="entrada">
+                        <input type="password" id="password" required>
+                        <label>Crie uma senha</label>
+                    </div>
+                    <div class="termos">
+                        <input type=checkbox id="termos" required>
+                        <label for="termos">
+                            Eu aceito os 
+                            <a href="#">Termos & Condições</a>
+                        </label>
+                    </div>
+                    <button type="submit">Inscrever-se</button>
+                    <div class="registrar">
+                        <p>Já tem uma conta? <a 
+                        href="login.html">Login</a></p>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <script>
+            const API_URL = 'http://localhost:5000/api'; 
+
+            const registerForm = document.getElementById('register-form');
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+
+                const username = document.getElementById('username').value; 
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const button = registerForm.querySelector('button');
+                button.disabled = true;
+                button.textContent = 'Criando...';
+
+                try {
+                    const response = await fetch(`${API_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Não foi possível criar a conta.');
+                    }
+
+                    // --- MUDANÇA AQUI ---
+                    localStorage.setItem('authToken', data.token); // Salva o token
+                    // Salva os dados do usuário para a home_page usar
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    // Marca como "primeiro login" para o prompt do título
+                    localStorage.setItem('firstLogin', 'true');
+L                    // --- FIM DA MUDANÇA ---
+                    
+                    window.location.href = 'home_page.html'; 
+
+                } catch (error) {
+                    alert(`Erro ao criar conta: ${error.message}`);
+                    button.disabled = false;
+                    button.textContent = 'Inscrever-se';
+                }
+            });
+        </script>
+    </body>
+</html>

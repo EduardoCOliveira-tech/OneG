@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Registry - Suas Listas de Presentes</title>
+    <link rel="stylesheet" href="css/telaum_style.css"> 
+    <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="#" class="logo">Gift Registry</a>
+            <nav>
+                <a href="login.html" class="nav-link">Entrar</a>
+                <a href="criar_conta.html" class="btn-primary">Criar Conta</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Suas Listas de Presentes, <br>Perfeitas e <span class="highlight">Compartilháveis</span></h1>
+                <p class="subtitle">
+                    Organize seus presentes desejados, customize seu perfil e compartilhe 
+                    suas listas com amigos e família de forma fácil e segura.
+                </p>
+                <div class="hero-buttons">
+                    <a href="criar_conta.html" class="btn-primary">Começar Agora</a>
+                    <a href="login.html" class="btn-secondary">Já tenho Conta</a>
+                </div>
+
+                <div class="profile-search">
+                    <h3>Ou procure por uma lista pública</h3>
+                    <form class="search-form" id="profile-search-form">
+                        <input type="text" id="search-query" placeholder="Digite o nome de usuário ou email..." required>
+                        <button type="submit" class="btn-primary">Buscar</button>
+                    </form>
+                    
+                    <div id="search-results-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2>Funcionalidades Principais</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon-wrapper">🎁</div>
+                        <h3>Crie suas Listas</h3>
+                        <p>Organize seus presentes em categorias personalizadas</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrapper">🔗</div>
+                        <h3>Compartilhe Facilmente</h3>
+                        <p>Gere links únicos para compartilhar com amigos e família</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrapper">👀</div>
+                        <h3>Veja Listas Alheias</h3>
+                        <p>Acesse listas de outras pessoas via link compartilhado</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrapper">🎨</div>
+                        <h3>Customize seu Perfil</h3>
+                        <p>Personalize cores, tema escuro e foto de perfil</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>Pronto para começar?</h2>
+                <p>Crie sua conta e comece a organizar suas listas de presentes hoje mesmo!</p>
+                <a href="criar_conta.html" class="btn-primary">Criar Conta Grátis</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Gift Registry. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api'; 
+        const searchForm = document.getElementById('profile-search-form');
+        const resultsContainer = document.getElementById('search-results-container');
+
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('search-query').value;
+            resultsContainer.innerHTML = '<p>Buscando...</p>'; // Mostra feedback
+
+            try {
+                // Chama a nova rota de busca
+                const response = await fetch(`${API_URL}/users/search?q=${query}`);
+                const profiles = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(profiles.message);
+                }
+
+                if (profiles.length === 0) {
+                  resultsContainer.innerHTML = '<p>Nenhum perfil público encontrado.</p>';
+                  return;
+                }
+
+                // Limpa o container e adiciona os links
+                resultsContainer.innerHTML = '<h4>Perfis encontrados:</h4>';
+                profiles.forEach(profile => {
+                    const link = document.createElement('a');
+                    link.href = `public_list.html?user=${profile.username}`;
+                    link.textContent = profile.username;
+                    link.target = "_blank"; // Abre em nova aba
+                    link.classList.add('profile-link'); // Adiciona classe para estilização
+                    resultsContainer.appendChild(link);
+                });
+                
+            } catch (error) {
+                resultsContainer.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

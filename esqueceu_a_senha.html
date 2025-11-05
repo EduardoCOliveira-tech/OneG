@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Smart Wall: Recuperação de Senha</title>
+        <link rel="stylesheet" href="css/criar_conta.css">
+        <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+    </head>
+    <body>
+        <main>
+            <div class="wrapper">
+                <form id="recover-form">
+                    <h2>Recuperar Senha</h2>
+                        <div class="entrada">
+                        <input type="email" id="email" required>
+                        <label>Email</label>
+                    </div>
+                    <div class="esqueceu">
+                    </div>
+                    <button type="submit">Enviar Email de Recuperação</button>
+                    <div class="registrar">
+                        <p>Já tem uma conta? <a 
+                        href="login.html">Login</a></p>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <script>
+            // Mude para 'http://localhost:5000/api' se estiver rodando localmente
+            const API_URL = '/api'; 
+
+            const recoverForm = document.getElementById('recover-form');
+            recoverForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+
+                const email = document.getElementById('email').value;
+                const button = recoverForm.querySelector('button');
+                button.disabled = true;
+                button.textContent = 'Enviando...';
+
+                try {
+                    // *** NOTA: A ROTA '/api/auth/forgot-password' NÃO FOI IMPLEMENTADA NO BACK-END AINDA ***
+                    // O código abaixo funcionará quando você implementar.
+                    /*
+                    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email }),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message);
+                    */
+                    
+                    // Simulação de sucesso (Remova isso quando implementar o back-end)
+                    await new Promise(resolve => setTimeout(resolve, 1000)); 
+                    alert('Se uma conta com este e-mail existir, um link de recuperação foi enviado.');
+                    
+                    window.location.href = 'login.html';
+
+                } catch (error) {
+                    alert(`Erro: ${error.message}`);
+                    button.disabled = false;
+                    button.textContent = 'Enviar Email de Recuperação';
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Smart Wall: Login</title> <link rel="stylesheet" href="css/criar_conta.css">
+        <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+    </head>
+    <body>
+        <main>
+            <div class="wrapper">
+                <form id="login-form">
+                    <h2>Login</h2>
+                        <div class="entrada">
+                        <input type="email" id="email" required>
+                        <label>Email</label>
+                    </div>
+                    <div class="entrada">
+                        <input type="password" id="password" required>
+                        <label>Senha</label>
+                    </div>
+                    <div class="esqueceu">
+                        <label for="lembrar">
+                            <input type="checkbox" id="lembrar">
+                            <p>Lembrar</p>
+                        </label>
+                        <a href="esqueceu_a_senha.html">Esqueceu a senha?</a>
+                    </div>
+                    <button type="submit">log In</button>
+                    <div class="registrar">
+                        <p>Não tem uma conta? <a 
+                        href="criar_conta.html">Registrar</a></p>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <script>
+            const API_URL = 'http://localhost:5000/api'; 
+
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const button = loginForm.querySelector('button');
+                button.disabled = true;
+                button.textContent = 'Entrando...';
+
+                try {
+                    const response = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Credenciais inválidas.');
+                    }
+
+                    // --- MUDANÇA AQUI ---
+                    localStorage.setItem('authToken', data.token); // Salva o token
+                    // Salva os dados do usuário para a home_page usar
+                    localStorage.setItem('userData', JSON.stringify(data.user)); 
+                    // --- FIM DA MUDANÇA ---
+                    
+                    window.location.href = 'home_page.html'; 
+
+                } catch (error) {
+                    alert(`Erro ao fazer login: ${error.message}`);
+                    button.disabled = false;
+                    button.textContent = 'log In';
+                }
+            });
+        </script>
+    </body>
+</html>
