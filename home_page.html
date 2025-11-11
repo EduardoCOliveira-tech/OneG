@@ -19,11 +19,11 @@
     <aside class="sidebar">
       <header class="sidebar-header">
         
-        <a href="#" class="header-logo" id="editProfilePicLink">
-          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi42NiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+" alt="Logo" id="sidebar-profile-pic" />
+        <a href="#" class="header-logo" id="editProfilePicLink" title="Editar Perfil">
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi4yNiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+" alt="Logo" id="sidebar-profile-pic" />
         </a>
         
-        <button class="sidebar-toggler">
+        <button class="sidebar-toggler" title="Abrir/Fechar Menu">
           <span class="material-symbols-rounded">menu</span>
         </button>
       </header>
@@ -31,7 +31,7 @@
         <ul class="nav-list primary-nav">
             
             <li class="nav-item dropdown-container">
-              <a href="#" class="nav-link dropdown-toggle">
+              <a href="#" class="nav-link dropdown-toggle" title="Perfil">
                 <span class="material-symbols-rounded">person</span>
                 <span class="nav-label">Perfil</span>
                 <span class="dropdown-icon material-symbols-rounded">keyboard_arrow_down</span>
@@ -45,7 +45,7 @@
             </li>
             
             <li class="nav-item dropdown-container">
-              <a href="#" class="nav-link dropdown-toggle">
+              <a href="#" class="nav-link dropdown-toggle" title="Config. Geral">
                 <span class="material-symbols-rounded">settings</span>
                 <span class="nav-label">Config. Geral</span>
                 <span class="dropdown-icon material-symbols-rounded">keyboard_arrow_down</span>
@@ -66,19 +66,20 @@
             </li>
             
             <li class="nav-item">
-              <a href="#" class="nav-link" id="notificationsLink">
+              <a href="#" class="nav-link" id="notificationsLink" title="Notificações">
                 <span class="material-symbols-rounded">notifications</span>
                 <span class="nav-label">Notificações</span>
               </a>
             </li>
             
             <li class="nav-item dropdown-container">
-              <a href="#" class="nav-link dropdown-toggle">
+              <a href="#" class="nav-link dropdown-toggle" title="Informações">
                 <span class="material-symbols-rounded">star</span>
                 <span class="nav-label">Informações</span>
                 <span class="dropdown-icon material-symbols-rounded">keyboard_arrow_down</span>
               </a>
               <ul class="dropdown-menu">
+                <li class="nav-item"><a class="nav-link dropdown-title">Informações</a></li>
                 <li class="nav-item"><a href="#" class="nav-link dropdown-link" id="termsLink">Termos & condições</a></li>
                 <li class="nav-item"><a href="#" class="nav-link dropdown-link" id="privacyLink">Política e Privacidade</a></li>
               </ul>
@@ -87,13 +88,13 @@
           
           <ul class="nav-list secondary-nav">
             <li class="nav-item">
-              <a href="#" class="nav-link" id="supportLink">
+              <a href="#" class="nav-link" id="supportLink" title="Suporte">
                 <span class="material-symbols-rounded">help</span>
                 <span class="nav-label">Suporte</span>
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" id="logoutLink" class="nav-link">
+              <a href="#" id="logoutLink" class="nav-link" title="Sair">
                 <span class="material-symbols-rounded">logout</span>
                 <span class="nav-label">Sair</span>
               </a>
@@ -161,6 +162,7 @@
                                 <option value="">Selecione uma categoria</option>
                             </select>
                             <button type="button" id="addCategoryBtn" style="white-space: nowrap;">+ Nova</button>
+                            <button type="button" id="deleteCategoryBtn" class="delete-btn" style="white-space: nowrap;">- Apagar</button>
                         </div>
                     </div>
                     <div class="form-group hidden" id="workGroup">
@@ -283,13 +285,13 @@
                         <button type="submit">Salvar Alterações</button>
                     </div>
                 </form>
-
+                
                 <div class="delete-account-section">
-                      <hr style="border-top: 1px solid #ddd; margin: 20px 0;">
-                      <h3>Zona de Perigo</h3>
-                      <p style="font-size: 0.9em; color: #555; margin-bottom: 10px;">Excluir sua conta é uma ação permanente e não pode ser desfeita.</p>
-                      <button type="button" class="delete-button" id="deleteAccountBtn">Excluir Minha Conta</button>
-                  </div>
+                    <hr style="border-top: 1px solid #ddd; margin: 20px 0;">
+                    <h3>Zona de Perigo</h3>
+                    <p style="font-size: 0.9em; color: #555; margin-bottom: 10px;">Excluir sua conta é uma ação permanente e não pode ser desfeita.</p>
+                    <button type="button" class="delete-button" id="deleteAccountBtn">Excluir Minha Conta</button>
+                </div>
             </div>
         </div>
         
