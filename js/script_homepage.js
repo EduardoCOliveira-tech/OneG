@@ -1,4 +1,5 @@
 /* === PARTE 1: SUA LÓGICA ORIGINAL DA SIDEBAR === */
+// (O código da sua sidebar para os dropdowns permanece o mesmo)
 const toggleDropdown = (dropdown, menu, isOpen) => {
     dropdown.classList.toggle("open", isOpen);
     menu.style.height = isOpen ? `${menu.scrollHeight}px` : 0;
@@ -29,8 +30,8 @@ const toggleDropdown = (dropdown, menu, isOpen) => {
 
 /* === PARTE 2: NOVA LÓGICA DE FUNCIONALIDADES (Lista de Presentes, Perfil, etc.) === */
 
-const API_URL = 'https://oneg-6x4j.onrender.com/api';
-const DEFAULT_PROFILE_PIC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi42NiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+';
+const API_URL = 'https://oneg-6x4j.onrender.com/api'; 
+const DEFAULT_PROFILE_PIC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi4xNiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+';
 
 let items = [];
 let mangas = [];
@@ -73,7 +74,7 @@ const workGroup = document.getElementById('workGroup');
 const itemWork = document.getElementById('itemWork');
 const addCategoryBtn = document.getElementById('addCategoryBtn');
 const addMangaBtn = document.getElementById('addMangaBtn');
-const deleteCategoryBtn = document.getElementById('deleteCategoryBtn'); // <-- NOVO
+const deleteCategoryBtn = document.getElementById('deleteCategoryBtn'); 
 const categoryPopup = document.getElementById('categoryPopup');
 const mangaPopup = document.getElementById('mangaPopup');
 const newCategoryName = document.getElementById('newCategoryName');
@@ -93,7 +94,7 @@ const uploadStatus = document.getElementById('upload-status');
 const editUsernameInput = document.getElementById('editUsername');
 const editEmailInput = document.getElementById('editEmail');
 const isPublicToggle = document.getElementById('isPublicToggle');
-const deleteAccountBtn = document.getElementById('deleteAccountBtn'); // <-- NOVO
+const deleteAccountBtn = document.getElementById('deleteAccountBtn'); 
 
 // Links Estáticos
 const notificationsLink = document.getElementById('notificationsLink');
@@ -101,6 +102,7 @@ const termsLink = document.getElementById('termsLink');
 const privacyLink = document.getElementById('privacyLink');
 const supportLink = document.getElementById('supportLink');
 
+// NOVO: Seletor do Modo Escuro
 const darkModeToggle = document.getElementById('darkModeToggle');
 
 // --- Inicialização ---
@@ -134,7 +136,7 @@ async function initializeApp() {
     // 5. Adicionar todos os event listeners
     setupEventListeners();
 
-    // 6. Aplicar tema (modo escuro/claro)
+    // 6. NOVO: Aplicar tema (modo escuro/claro)
     applyTheme();
 
     // 7. Buscar dados da API (itens, categorias, mangás)
@@ -204,7 +206,7 @@ function setupEventListeners() {
     // Evento de Upload de Imagem
     profilePictureFile.addEventListener('change', handleImageFileSelect);
     
-    // Listener do Modo Escuro
+    // NOVO: Listener do Modo Escuro
     darkModeToggle.addEventListener('change', toggleTheme);
     
     // Links Estáticos (Placeholders)
@@ -222,7 +224,6 @@ function setupEventListeners() {
 // --- Funções de Perfil e Usuário ---
 
 function populateUIWithUserData() {
-    // ... (código existente, sem alterações)
     if (!userData) return;
     sidebarUsername.textContent = userData.username;
     sidebarEmail.textContent = userData.email;
@@ -232,7 +233,6 @@ function populateUIWithUserData() {
 }
 
 async function refreshUserProfile() {
-    // ... (código existente, sem alterações)
     try {
         const freshUser = await fetchWithAuth(`${API_URL}/profile`);
         localStorage.setItem('userData', JSON.stringify(freshUser));
@@ -244,7 +244,6 @@ async function refreshUserProfile() {
 }
 
 function checkFirstLogin() {
-    // ... (código existente, sem alterações)
     if (localStorage.getItem('firstLogin') === 'true') {
         setTimeout(() => {
             const newTitle = prompt(
@@ -262,12 +261,12 @@ function checkFirstLogin() {
 }
 
 async function saveListTitle() {
-    // ... (código existente, sem alterações)
     const newTitle = listTitleElement.textContent.trim();
     if (newTitle === userData.listTitle || newTitle === '') {
         listTitleElement.textContent = userData.listTitle; 
         return;
     }
+
     try {
         const updatedUser = await fetchWithAuth(`${API_URL}/profile`, {
             method: 'PUT',
@@ -290,14 +289,13 @@ function logout(e) {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('firstLogin');
-    localStorage.removeItem('theme'); 
-    window.location.href = 'index.html'; 
+    localStorage.removeItem('theme'); // Limpa a preferência de tema
+    window.location.href = 'index.html'; // Redireciona para o index
 }
 
-// --- Funções de Tema (Modo Escuro) ---
+// --- NOVAS FUNÇÕES DE TEMA (MODO ESCURO) ---
 
 function applyTheme() {
-    // ... (código existente, sem alterações)
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'dark') {
         document.body.classList.add('dark-mode');
@@ -309,7 +307,6 @@ function applyTheme() {
 }
 
 function toggleTheme() {
-    // ... (código existente, sem alterações)
     if (darkModeToggle.checked) {
         document.body.classList.add('dark-mode');
         localStorage.setItem('theme', 'dark');
@@ -322,7 +319,6 @@ function toggleTheme() {
 // --- Funções dos Modais (Abrir/Fechar) ---
 
 function openAddModal() {
-    // ... (código existente, sem alterações)
     editingItemId = null;
     modalTitle.textContent = 'Adicionar Novo Item';
     itemForm.reset();
@@ -331,27 +327,27 @@ function openAddModal() {
 }
 
 function openChangePasswordModal(e) {
-    // ... (código existente, sem alterações)
     e.preventDefault();
     changePasswordForm.reset();
     changePasswordModal.style.display = 'flex';
 }
 
 function openEditProfileModal(e) {
-    // ... (código existente, sem alterações)
     e.preventDefault();
+    
     profilePicPreview.src = userData.profilePicture || DEFAULT_PROFILE_PIC;
     profilePictureStringInput.value = userData.profilePicture; 
     profilePictureFile.value = null; 
     uploadStatus.classList.add('hidden'); 
+    
     editUsernameInput.value = userData.username;
     editEmailInput.value = userData.email;
     isPublicToggle.checked = userData.isPublic;
+    
     editProfileModal.style.display = 'flex';
 }
 
 function closeModal() {
-    // ... (código existente, sem alterações)
     itemModal.style.display = 'none';
     changePasswordModal.style.display = 'none';
     editProfileModal.style.display = 'none';
@@ -360,24 +356,25 @@ function closeModal() {
 // --- Funções dos Modais (Submissão de Forms) ---
 
 async function handleChangePassword(e) {
-    // ... (código existente, sem alterações)
     e.preventDefault();
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
     if (newPassword !== confirmNewPassword) {
         return alert('A nova senha e a confirmação não coincidem.');
     }
     if (newPassword.length < 6) {
         return alert('A nova senha deve ter no mínimo 6 caracteres.');
     }
+
     try {
         const data = await fetchWithAuth(`${API_URL}/profile/change-password`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ currentPassword, newPassword })
         });
-        alert(data.message); 
+        alert(data.message); // "Senha alterada com sucesso."
         closeModal();
     } catch (error) {
         alert('Erro ao mudar senha: ' + error.message);
@@ -385,14 +382,15 @@ async function handleChangePassword(e) {
 }
 
 async function handleEditProfile(e) {
-    // ... (código existente, sem alterações)
     e.preventDefault();
+    
     const updatedProfile = {
         username: editUsernameInput.value,
         email: editEmailInput.value,
         profilePicture: profilePictureStringInput.value || DEFAULT_PROFILE_PIC,
         isPublic: isPublicToggle.checked
     };
+
     try {
         const updatedUser = await fetchWithAuth(`${API_URL}/profile`, {
             method: 'PUT',
@@ -431,7 +429,7 @@ async function handleDeleteAccount() {
         logout(); // Desloga e redireciona para a página inicial
 
     } catch (error) {
-        alert('Erro ao excluir sua conta: ' + error.message);
+        alert('Erro ao excluir sua conta: 'AS_AVAILABLE' + error.message);
     }
 }
 
@@ -470,18 +468,25 @@ async function handleDeleteCategory() {
 
 // (Função de Upload com Redimensionamento)
 function handleImageFileSelect(e) {
-    // ... (código existente, sem alterações)
     const file = e.target.files[0];
     if (!file) return;
+
+    // 1. Mostrar feedback
     uploadStatus.textContent = 'Processando imagem...';
     uploadStatus.classList.remove('hidden');
+
+    // 2. Criar um leitor de arquivo
     const reader = new FileReader();
+
     reader.onload = function(event) {
         const img = new Image();
         img.src = event.target.result;
+
         img.onload = function() {
+            // 3. Imagem carregada, vamos redimensioná-la
             const MAX_WIDTH = 800; 
             const MAX_HEIGHT = 800; 
+
             let width = img.width;
             let height = img.height;
             if (width > height) {
@@ -506,11 +511,13 @@ function handleImageFileSelect(e) {
             uploadStatus.classList.add('hidden');
         }
     };
+    
     reader.onerror = function(error) {
         console.error('Erro ao ler o arquivo:', error);
         alert('Erro ao processar a imagem.');
         uploadStatus.classList.add('hidden');
     };
+
     reader.readAsDataURL(file);
 }
 
@@ -518,7 +525,6 @@ function handleImageFileSelect(e) {
 // --- Funções de Requisição (Fetch) ---
 
 async function fetchWithAuth(url, options = {}) {
-    // ... (código existente, sem alterações)
     const token = localStorage.getItem('authToken');
     if (!token) {
         logout(); 
@@ -551,27 +557,23 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // --- Funções da Lista (CRUD, Render, Filtros) ---
-// (O restante do seu código JS continua aqui, sem alterações)
 
 async function loadItems() {
-    // ... (código existente, sem alterações)
     items = await fetchWithAuth(`${API_URL}/items`);
+    renderItems(); // Renderiza os itens assim que são carregados
+    updateTotalValue();
 }
 async function loadCategories() {
-    // ... (código existente, sem alterações)
-    // MODIFICAÇÃO: Não estamos mais a guardar apenas os nomes, mas os objetos completos
     const categoriesData = await fetchWithAuth(`${API_URL}/categories`);
-    categories = categoriesData; // Agora 'categories' é um array de [{_id: '...', name: '...'}]
+    categories = categoriesData; 
     populateCategoryFilters();
 }
 async function loadMangas() {
-    // ... (código existente, sem alterações)
     mangas = (await fetchWithAuth(`${API_URL}/mangas`)).map(c => c.name);
     populateMangaFilters();
 }
 
 function renderItems() {
-    // ... (código existente, sem alterações)
     const category = categoryFilter.value;
     const status = statusFilter.value;
     const searchTerm = searchInput.value.toLowerCase();
@@ -635,7 +637,6 @@ function renderItems() {
 }
 
 function handleCategoryFilterChange() {
-    // ... (código existente, sem alterações)
     if (this.value === 'Mangás') {
         mangaFilterContainer.classList.remove('hidden');
     } else {
@@ -646,11 +647,9 @@ function handleCategoryFilterChange() {
 }
 
 function populateCategoryFilters() {
-    // ... (código existente, sem alterações)
     categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
     itemCategory.innerHTML = '<option value="">Selecione uma categoria</option>';
     
-    // MODIFICAÇÃO: Agora iteramos sobre objetos, então usamos category.name
     categories.forEach(category => {
         const option1 = document.createElement('option');
         option1.value = category.name;
@@ -665,7 +664,6 @@ function populateCategoryFilters() {
 }
 
 function populateMangaFilters() {
-    // ... (código existente, sem alterações)
     mangaFilter.innerHTML = '<option value="">Todos os mangás</option>';
     itemWork.innerHTML = '<option value="">Selecione um mangá</option>';
     
@@ -683,8 +681,8 @@ function populateMangaFilters() {
 }
 
 async function saveItem(e) {
-    // ... (código existente, sem alterações)
     e.preventDefault();
+    
     const itemData = {
         name: document.getElementById('itemName').value,
         price: parseFloat(document.getElementById('itemPrice').value) || 0,
@@ -695,19 +693,23 @@ async function saveItem(e) {
         image: document.getElementById('itemImage').value,
         notes: document.getElementById('itemNotes').value,
     };
+    
     const method = editingItemId ? 'PUT' : 'POST';
     const url = editingItemId ? `${API_URL}/items/${editingItemId}` : `${API_URL}/items`;
+
     try {
         const savedItem = await fetchWithAuth(url, {
             method: method,
             body: JSON.stringify(itemData),
         });
+        
         if (editingItemId) {
             const index = items.findIndex(item => item._id === editingItemId);
             if (index !== -1) items[index] = savedItem;
         } else {
             items.push(savedItem);
         }
+        
         renderItems();
         updateTotalValue();
         closeModal();
@@ -717,11 +719,12 @@ async function saveItem(e) {
 }
 
 function editItem(id) {
-    // ... (código existente, sem alterações)
     const item = items.find(item => item._id === id);
     if (!item) return;
+    
     editingItemId = id;
     modalTitle.textContent = 'Editar Item';
+    
     document.getElementById('itemName').value = item.name;
     document.getElementById('itemPrice').value = item.price;
     document.getElementById('itemCategory').value = item.category;
@@ -729,17 +732,18 @@ function editItem(id) {
     document.getElementById('itemLink').value = item.link || '';
     document.getElementById('itemImage').value = item.image || '';
     document.getElementById('itemNotes').value = item.notes || '';
+    
     if (item.category === 'Mangás') {
         workGroup.classList.remove('hidden');
         document.getElementById('itemWork').value = item.work || '';
     } else {
         workGroup.classList.add('hidden');
     }
+    
     itemModal.style.display = 'flex';
 }
 
 async function deleteItem(id) {
-    // ... (código existente, sem alterações)
     if (confirm('Tem certeza que deseja excluir este item?')) {
         try {
             await fetchWithAuth(`${API_URL}/items/${id}`, { method: 'DELETE' });
@@ -753,15 +757,17 @@ async function deleteItem(id) {
 }
 
 async function togglePurchase(id) {
-    // ... (código existente, sem alterações)
     const item = items.find(item => item._id === id);
     if (!item) return;
+
     const newPurchasedStatus = !item.purchased;
+
     try {
         const updatedItem = await fetchWithAuth(`${API_URL}/items/${id}`, {
             method: 'PATCH',
             body: JSON.stringify({ purchased: newPurchasedStatus }),
         });
+
         item.purchased = updatedItem.purchased;
         renderItems();
         updateTotalValue();
@@ -771,23 +777,20 @@ async function togglePurchase(id) {
 }
 
 function updateTotalValue() {
-    // ... (código existente, sem alterações)
     const total = items
         .filter(item => !item.purchased)
         .reduce((sum, item) => sum + (item.price || 0), 0);
+    
     totalValue.textContent = total.toFixed(2);
 }
 
 function openCategoryPopup() {
-    // ... (código existente, sem alterações)
     categoryPopup.style.display = 'flex';
 }
 function closeCategoryPopup() {
-    // ... (código existente, sem alterações)
     categoryPopup.style.display = 'none';
 }
 async function saveNewCategory() {
-    // ... (código existente, sem alterações)
     const categoryName = newCategoryName.value.trim();
     if (categoryName && !categories.map(c => c.name).includes(categoryName)) { // Modificado para verificar array de objetos
         try {
@@ -800,7 +803,7 @@ async function saveNewCategory() {
             itemCategory.value = categoryName;
             closeCategoryPopup();
         } catch (error) {
-            alert('Erro ao salvar categoria: ' + error.message);
+            alert('Erro ao salvar categoria: 'JÁ ESTÁ PRONTA' + error.message);
         }
     } else if (categories.map(c => c.name).includes(categoryName)) {
         alert('Esta categoria já existe!');
@@ -808,15 +811,12 @@ async function saveNewCategory() {
 }
 
 function openMangaPopup() {
-    // ... (código existente, sem alterações)
     mangaPopup.style.display = 'flex';
 }
 function closeMangaPopup() {
-    // ... (código existente, sem alterações)
     mangaPopup.style.display = 'none';
 }
 async function saveNewManga() {
-    // ... (código existente, sem alterações)
     const mangaName = newMangaName.value.trim();
     if (mangaName && !mangas.includes(mangaName)) {
         try {
@@ -834,4 +834,5 @@ async function saveNewManga() {
     } else if (mangas.includes(mangaName)) {
         alert('Este mangá já existe!');
     }
+}
 }
