@@ -14,7 +14,6 @@ router.use(authMiddleware);
 // @route   GET /api/profile
 // @desc    Busca o perfil do usuário logado
 router.get('/', async (req, res) => {
-    // ... (código existente, sem alterações)
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) {
@@ -30,7 +29,6 @@ router.get('/', async (req, res) => {
 // @route   PUT /api/profile
 // @desc    Atualiza o perfil do usuário logado
 router.put('/', async (req, res) => {
-    // ... (código existente, sem alterações)
     const { username, email, listTitle, profilePicture, isPublic } = req.body;
     const profileFields = {};
     if (username) profileFields.username = username;
@@ -70,7 +68,6 @@ router.put('/', async (req, res) => {
 // @route   PUT /api/profile/change-password
 // @desc    Muda a senha do usuário
 router.put('/change-password', async (req, res) => {
-    // ... (código existente, sem alterações)
     const { currentPassword, newPassword } = req.body;
     try {
         const user = await User.findById(req.user.id);
