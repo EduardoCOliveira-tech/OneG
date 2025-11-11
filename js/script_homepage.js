@@ -1,5 +1,4 @@
 /* === PARTE 1: SUA LÓGICA ORIGINAL DA SIDEBAR === */
-// (O código da sua sidebar para os dropdowns permanece o mesmo)
 const toggleDropdown = (dropdown, menu, isOpen) => {
     dropdown.classList.toggle("open", isOpen);
     menu.style.height = isOpen ? `${menu.scrollHeight}px` : 0;
@@ -30,12 +29,12 @@ const toggleDropdown = (dropdown, menu, isOpen) => {
 
 /* === PARTE 2: NOVA LÓGICA DE FUNCIONALIDADES (Lista de Presentes, Perfil, etc.) === */
 
-const API_URL = 'https://oneg-6x4j.onrender.com/api'; 
-const DEFAULT_PROFILE_PIC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi4xNiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+';
+const API_URL = 'https://oneg-6x4j.onrender.com/api';
+const DEFAULT_PROFILE_PIC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi42NiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+';
 
 let items = [];
 let mangas = [];
-let categories = [];
+let categories = []; // AGORA VAI SER UM ARRAY DE OBJETOS: [{_id: '...', name: '...'}]
 let editingItemId = null;
 let userData = null; 
 
@@ -74,7 +73,7 @@ const workGroup = document.getElementById('workGroup');
 const itemWork = document.getElementById('itemWork');
 const addCategoryBtn = document.getElementById('addCategoryBtn');
 const addMangaBtn = document.getElementById('addMangaBtn');
-const deleteCategoryBtn = document.getElementById('deleteCategoryBtn'); 
+const deleteCategoryBtn = document.getElementById('deleteCategoryBtn'); // <-- NOVO
 const categoryPopup = document.getElementById('categoryPopup');
 const mangaPopup = document.getElementById('mangaPopup');
 const newCategoryName = document.getElementById('newCategoryName');
@@ -94,7 +93,7 @@ const uploadStatus = document.getElementById('upload-status');
 const editUsernameInput = document.getElementById('editUsername');
 const editEmailInput = document.getElementById('editEmail');
 const isPublicToggle = document.getElementById('isPublicToggle');
-const deleteAccountBtn = document.getElementById('deleteAccountBtn'); 
+const deleteAccountBtn = document.getElementById('deleteAccountBtn'); // <-- NOVO
 
 // Links Estáticos
 const notificationsLink = document.getElementById('notificationsLink');
@@ -102,7 +101,6 @@ const termsLink = document.getElementById('termsLink');
 const privacyLink = document.getElementById('privacyLink');
 const supportLink = document.getElementById('supportLink');
 
-// NOVO: Seletor do Modo Escuro
 const darkModeToggle = document.getElementById('darkModeToggle');
 
 // --- Inicialização ---
@@ -136,7 +134,7 @@ async function initializeApp() {
     // 5. Adicionar todos os event listeners
     setupEventListeners();
 
-    // 6. NOVO: Aplicar tema (modo escuro/claro)
+    // 6. Aplicar tema (modo escuro/claro)
     applyTheme();
 
     // 7. Buscar dados da API (itens, categorias, mangás)
@@ -146,8 +144,7 @@ async function initializeApp() {
             loadMangas(),
             loadItems()
         ]);
-        renderItems();
-        updateTotalValue();
+        // renderItems() e updateTotalValue() são chamados dentro de loadItems()
     } catch (error) {
         console.error('Erro ao carregar dados da lista:', error);
         alert('Erro ao carregar seus itens: ' + error.message);
@@ -206,7 +203,7 @@ function setupEventListeners() {
     // Evento de Upload de Imagem
     profilePictureFile.addEventListener('change', handleImageFileSelect);
     
-    // NOVO: Listener do Modo Escuro
+    // Listener do Modo Escuro
     darkModeToggle.addEventListener('change', toggleTheme);
     
     // Links Estáticos (Placeholders)
@@ -289,11 +286,11 @@ function logout(e) {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('firstLogin');
-    localStorage.removeItem('theme'); // Limpa a preferência de tema
-    window.location.href = 'index.html'; // Redireciona para o index
+    localStorage.removeItem('theme'); 
+    window.location.href = 'index.html'; 
 }
 
-// --- NOVAS FUNÇÕES DE TEMA (MODO ESCURO) ---
+// --- Funções de Tema (Modo Escuro) ---
 
 function applyTheme() {
     const currentTheme = localStorage.getItem('theme');
@@ -374,7 +371,7 @@ async function handleChangePassword(e) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ currentPassword, newPassword })
         });
-        alert(data.message); // "Senha alterada com sucesso."
+        alert(data.message); 
         closeModal();
     } catch (error) {
         alert('Erro ao mudar senha: ' + error.message);
@@ -429,7 +426,7 @@ async function handleDeleteAccount() {
         logout(); // Desloga e redireciona para a página inicial
 
     } catch (error) {
-        alert('Erro ao excluir sua conta: 'AS_AVAILABLE' + error.message);
+        alert('Erro ao excluir sua conta: ' + error.message);
     }
 }
 
@@ -456,8 +453,7 @@ async function handleDeleteCategory() {
                 loadCategories(),
                 loadItems()
             ]);
-            renderItems();
-            updateTotalValue();
+            // O renderItems() e updateTotalValue() já são chamados dentro do loadItems()
 
         } catch (error) {
             alert('Erro ao excluir categoria: ' + error.message);
@@ -470,23 +466,15 @@ async function handleDeleteCategory() {
 function handleImageFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
-
-    // 1. Mostrar feedback
     uploadStatus.textContent = 'Processando imagem...';
     uploadStatus.classList.remove('hidden');
-
-    // 2. Criar um leitor de arquivo
     const reader = new FileReader();
-
     reader.onload = function(event) {
         const img = new Image();
         img.src = event.target.result;
-
         img.onload = function() {
-            // 3. Imagem carregada, vamos redimensioná-la
             const MAX_WIDTH = 800; 
             const MAX_HEIGHT = 800; 
-
             let width = img.width;
             let height = img.height;
             if (width > height) {
@@ -511,13 +499,11 @@ function handleImageFileSelect(e) {
             uploadStatus.classList.add('hidden');
         }
     };
-    
     reader.onerror = function(error) {
         console.error('Erro ao ler o arquivo:', error);
         alert('Erro ao processar a imagem.');
         uploadStatus.classList.add('hidden');
     };
-
     reader.readAsDataURL(file);
 }
 
@@ -565,7 +551,7 @@ async function loadItems() {
 }
 async function loadCategories() {
     const categoriesData = await fetchWithAuth(`${API_URL}/categories`);
-    categories = categoriesData; 
+    categories = categoriesData; // Agora 'categories' é um array de [{_id: '...', name: '...'}]
     populateCategoryFilters();
 }
 async function loadMangas() {
@@ -803,7 +789,7 @@ async function saveNewCategory() {
             itemCategory.value = categoryName;
             closeCategoryPopup();
         } catch (error) {
-            alert('Erro ao salvar categoria: 'JÁ ESTÁ PRONTA' + error.message);
+            alert('Erro ao salvar categoria: ' + error.message);
         }
     } else if (categories.map(c => c.name).includes(categoryName)) {
         alert('Esta categoria já existe!');
@@ -834,5 +820,4 @@ async function saveNewManga() {
     } else if (mangas.includes(mangaName)) {
         alert('Este mangá já existe!');
     }
-}
 }
