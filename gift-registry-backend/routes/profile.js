@@ -1,9 +1,12 @@
 // routes/profile.js
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs'); // <-- ESTA É A LINHA QUE FALTAVA
+const bcrypt = require('bcryptjs'); 
 const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../models/User');
+const Item = require('../models/Item');
+const Category = require('../models/Category');
+const Manga = require('../models/Manga');
 
 // Protege todas as rotas
 router.use(authMiddleware);
@@ -11,6 +14,7 @@ router.use(authMiddleware);
 // @route   GET /api/profile
 // @desc    Busca o perfil do usuário logado
 router.get('/', async (req, res) => {
+    // ... (código existente, sem alterações)
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) {
@@ -26,23 +30,19 @@ router.get('/', async (req, res) => {
 // @route   PUT /api/profile
 // @desc    Atualiza o perfil do usuário logado
 router.put('/', async (req, res) => {
+    // ... (código existente, sem alterações)
     const { username, email, listTitle, profilePicture, isPublic } = req.body;
-
-    // Constrói o objeto de atualização
     const profileFields = {};
     if (username) profileFields.username = username;
     if (email) profileFields.email = email;
     if (listTitle) profileFields.listTitle = listTitle;
     if (profilePicture) profileFields.profilePicture = profilePicture;
     if (isPublic !== undefined) profileFields.isPublic = isPublic;
-
     try {
         let user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
-
-        // Se o username ou email está sendo atualizado, verifica duplicatas
         if (username && username !== user.username) {
             const existingUsername = await User.findOne({ username });
             if (existingUsername) {
@@ -55,16 +55,12 @@ router.put('/', async (req, res) => {
                 return res.status(400).json({ message: 'Este e-mail já está em uso.' });
             }
         }
-
-        // Atualiza o usuário
         user = await User.findByIdAndUpdate(
             req.user.id,
             { $set: profileFields },
-            { new: true } // Retorna o documento atualizado
-        ).select('-password'); // Não retorna a senha
-
+            { new: true }
+        ).select('-password'); 
         res.json(user);
-
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Erro interno no servidor.' });
@@ -74,28 +70,21 @@ router.put('/', async (req, res) => {
 // @route   PUT /api/profile/change-password
 // @desc    Muda a senha do usuário
 router.put('/change-password', async (req, res) => {
+    // ... (código existente, sem alterações)
     const { currentPassword, newPassword } = req.body;
-
     try {
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
-
-        // Verifica a senha atual
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Senha atual incorreta.' });
         }
-
-        // Salva a nova senha (o hook 'pre-save' em User.js vai criptografá-la)
         user.password = newPassword;
         await user.save();
-
         res.json({ message: 'Senha alterada com sucesso.' });
-
     } catch (err) {
-        // Trata erros de validação (ex: senha muito curta)
         if (err.name === 'ValidationError') {
              return res.status(400).json({ message: err.message });
         }
@@ -104,5 +93,24 @@ router.put('/change-password', async (req, res) => {
     }
 });
 
+// @route   DELETE /api/profile
+// @desc    Exclui a conta do usuário e todos os seus dados
+router.delete('/', async (req, res) => {
+    try {
+        // 1. Exclui o usuário
+        await User.findByIdAndDelete(req.user.id);
+        
+        // 2. Exclui todos os dados associados a esse usuário
+        await Item.deleteMany({ userId: req.user.id });
+        await Category.deleteMany({ userId: req.user.id });
+        await Manga.deleteMany({ userId: req.user.id });
+
+        res.json({ message: 'Conta excluída com sucesso.' });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+});
 
 module.exports = router;
