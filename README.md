@@ -1,3 +1,3 @@
 # Meu site
 https://eduardocoliveira-tech.github.io/OneG/
-Obs: o site está hospedado de forma gratuita em outros site e por isso pode apresentar uma lentidão no primeiro start
+<br/>Obs: o site está hospedado de forma gratuita em outros site e por isso pode apresentar uma lentidão no primeiro start
