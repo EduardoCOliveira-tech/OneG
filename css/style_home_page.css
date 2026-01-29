@@ -395,6 +395,62 @@ select, input[type="text"], input[type="password"], input[type="number"], input[
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* === FORMULÁRIO COMPACTO (UMA COLUNA) === */
+
+/* 1. Ajuste do Modal para aproveitar melhor o espaço */
+#itemModal .modal-content {
+    padding: 15px 25px; /* Menos borda interna (antes era maior) */
+    margin: 2vh auto;   /* Margem externa pequena para subir o modal */
+    width: 400px;       /* Largura fixa confortável */
+    max-width: 95%;
+}
+
+/* 2. Reduzir drasticamente o espaço entre cada campo */
+.form-group {
+    margin-bottom: 8px; /* Reduzido de ~15px/20px para 8px */
+}
+
+/* 3. Ajustar Labels (Títulos dos campos) */
+.form-group label {
+    font-size: 13px;    /* Letra um pouco menor */
+    margin-bottom: 2px; /* Cola o título no campo */
+    font-weight: 600;
+}
+
+/* 4. Inputs mais finos (Campos de digitação) */
+.form-group input, 
+.form-group select {
+    padding: 6px 10px; /* Menos preenchimento interno */
+    height: 35px;      /* Altura fixa menor */
+    font-size: 14px;
+}
+
+/* 5. Área de Notas menor */
+#itemNotes {
+    height: 45px;      /* Reduz a altura da caixa de texto grande */
+    padding: 6px 10px;
+    font-size: 13px;
+    resize: none;      /* Impede o usuário de esticar e quebrar o layout */
+}
+
+/* 6. Botões compactos */
+.form-actions {
+    margin-top: 15px; /* Separa um pouco os botões do último campo */
+    padding-top: 0;
+}
+
+.form-actions button {
+    padding: 8px 20px; /* Botões ligeiramente menores */
+    font-size: 14px;
+}
+
+/* 7. Ajuste do Título do Modal */
+#modalTitle {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
 .modal-content h2 {
     margin-top: 0;
     margin-bottom: 20px;
