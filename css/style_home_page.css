@@ -160,21 +160,34 @@ body {
   position: absolute;
   top: 0; /* Alinha com o topo do ícone */
   left: 80px; /* Posição à direita da barra colapsada */
-  width: 200px; /* Largura fixa para o menu */
+  width: 225px; /* Largura fixa para o menu */
   opacity: 0;
   height: auto !important;
   padding: 5px; /* Padding pequeno */
   overflow-y: unset;
+  overflow: visible; /* IMPORTANTE: Permite que a setinha desenhada fora da caixa apareça */
   pointer-events: none;
-  
-  /* A CORREÇÃO PRINCIPAL: Fundo branco no modo claro */
   background: #ffffff; 
-  
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: opacity 0.4s ease, transform 0.4s ease;
   transform: translateX(-10px); /* Começa ligeiramente à esquerda */
 }
+
+/* 2. Criação da "Setinha" (Triângulo) */
+.sidebar.collapsed .dropdown-menu::before {
+    content: "";
+    position: absolute;
+    top: 15px; /* Altura alinhada com o ícone */
+    left: -8px; /* Joga para fora da caixa à esquerda */
+    border-width: 8px 8px 8px 0;
+    border-style: solid;
+    /* Cor da seta no Modo Claro (Branco) */
+    border-color: transparent #ffffff transparent transparent;
+    display: block;
+    filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.05)); /* Sombra suave na seta */
+}
+
 .sidebar.collapsed .dropdown-menu:has(.dropdown-link) {
   padding: 7px 10px; /* Padding consistente */
 }
@@ -619,6 +632,7 @@ body.dark-mode .nav-link.dropdown-link.theme-switch-wrapper {
   display: inline-block;
   width: 50px; 
   height: 24px; 
+  flex-shrink: 0;
 }
 .theme-switch input {
   opacity: 0;
@@ -635,6 +649,7 @@ body.dark-mode .nav-link.dropdown-link.theme-switch-wrapper {
   background-color: #ccc;
   transition: .4s;
   border-radius: 24px;
+  overflow: hidden;
 }
 .slider:before {
   position: absolute;
@@ -651,7 +666,7 @@ input:checked + .slider {
   background-color: #00bba5; 
 }
 input:checked + .slider:before {
-  transform: translateX(26px); 
+  transform: translateX(25px); 
 }
 
 /* === Media Queries === */
@@ -768,16 +783,26 @@ body.dark-mode .dropdown-menu .nav-item .nav-link:hover {
 
 /* CORREÇÃO: Dropdown flutuante no modo escuro */
 body.dark-mode .sidebar.collapsed .dropdown-menu {
-    background: #34495e; /* Fundo mais claro que o gradiente */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    /* Um verde bem escuro (quase preto) para combinar com o gradiente da sidebar */
+    background-color: #061e1b; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Sombra mais forte para profundidade */
 }
+
+/* Cor da seta no Modo Escuro (tem que ser a mesma do fundo do menu) */
+body.dark-mode .sidebar.collapsed .dropdown-menu::before {
+    border-color: transparent #061e1b transparent transparent;
+}
+
 /* Links dentro do fly-out escuro */
 body.dark-mode .sidebar.collapsed .dropdown-menu .nav-item .nav-link {
-  color: #ecf0f1 !important; /* Texto claro */
-  background: #34495e !important; 
+    color: #ecf0f1 !important; /* Texto claro */
+    background: #061e1b !important; 
+    border-radius: 6px; /* Arredondar cantos do item */
+    margin: 2px; /* Espacinho nas laterais */
 }
 body.dark-mode .sidebar.collapsed .dropdown-menu .nav-item .nav-link:hover {
-    background: #4a637e !important; /* Fundo de hover mais claro */
+    background-color: rgba(0, 187, 165, 0.15) !important; /* Verde OneG transparente */
+    color: #00bba5 !important; /* Texto verde neon */
 }
 /* Títulos dentro do fly-out escuro */
 body.dark-mode .sidebar.collapsed .dropdown-menu .nav-item .nav-link.dropdown-title {

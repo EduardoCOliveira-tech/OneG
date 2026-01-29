@@ -1,97 +1,96 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>OneG: Criar conta</title>
-        <link rel="stylesheet" href="css/criar_conta.css">
-        <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
-    </head>
-    <body>
-        <main>
-            <div class="wrapper">
-                <form id="register-form">
-                    <h2>Criar Conta</h2>
-                        
-                        <div class="entrada">
-                        <input type="text" id="username" required>
-                        <label>Crie um nome de usuário</label>
-                    </div>
-                    
-                    <div class="entrada">
-                        <input type="email" id="email" required>
-                        <label>Digite seu email</label>
-                    </div>
-                    <div class="entrada">
-                        <input type="password" id="password" required>
-                        <label>Crie uma senha</label>
-                    </div>
-                    <div class="termos">
-                        <input type=checkbox id="termos" required>
-                        <label for="termos">
-                            Eu aceito os 
-                            <a href="#">Termos & Condições</a>
-                        </label>
-                    </div>
-                    <button type="submit">Inscrever-se</button>
-                    <div class="registrar">
-                        <p>Já tem uma conta? <a 
-                        href="login.html">Login</a></p>
-                    </div>
-                </form>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - OneG</title>
+    <link rel="stylesheet" href="css/telaum_style.css">
+    <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+</head>
+<body class="auth-body">
+    
+    <main class="container">
+        <div class="auth-box">
+            <a href="index.html" class="back-home">
+                <span>←</span> Voltar para o início
+            </a>
+            <h2>Crie sua conta</h2>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário </label>
+                    <input type="text" id="username" name="username" placeholder="Ex: gamer_pro" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">Criar Conta Grátis</button>
+            </form>
+
+            <div class="switch-page">
+                Já tem uma conta? 
+                <a href="login.html">Entrar</a>
             </div>
-        </main>
+        </div>
+    </main>
 
-        <script>
-            const API_URL = 'https://oneg-6x4j.onrender.com/api'; 
+    <script type="module">
+        import { auth, db } from './js/firebase-config.js';
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-            const registerForm = document.getElementById('register-form');
-            registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); 
+        // Ícone padrão em base64 (para não depender de links externos)
+        //Substitua a linha antiga da imagem Base64 por esta URL externa limpa:
+        const DEFAULT_PROFILE_PIC = "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=128";  
 
-                const username = document.getElementById('username').value; 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const button = registerForm.querySelector('button');
-                button.disabled = true;
-                button.textContent = 'Criando...';
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            
+            btn.textContent = 'Criando...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
 
-                try {
-                    const response = await fetch(`${API_URL}/auth/register`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ username, email, password }),
-                    });
+            try {
+                // 1. Cria usuário na Autenticação
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-                    const data = await response.json();
+                // 2. Salva dados extras no Firestore (coleção 'users')
+                await setDoc(doc(db, "users", user.uid), {
+                    username: username,
+                    email: email,
+                    isPublic: true,
+                    listTitle: 'Minha Lista de Presentes',
+                    profilePicture: DEFAULT_PROFILE_PIC,
+                    uid: user.uid
+                });
 
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Não foi possível criar a conta.');
-                    }
+                alert('Conta criada com sucesso!');
+                window.location.href = 'home_page.html';
+                
+            } catch (error) {
+                let msg = 'Erro ao criar conta: ' + error.message;
+                if(error.code === 'auth/email-already-in-use') msg = 'Este e-mail já está cadastrado.';
+                
+                alert(msg);
+                
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        });
+    </script>
 
-                    // --- MUDANÇA AQUI ---
-                    localStorage.setItem('authToken', data.token); // Salva o token
-                    // Salva os dados do usuário para a home_page usar
-                    localStorage.setItem('userData', JSON.stringify(data.user));
-                    // Marca como "primeiro login" para o prompt do título
-                    localStorage.setItem('firstLogin', 'true');
-                    // --- FIM DA MUDANÇA --- (Letra "L" removida)
-                    
-                    window.location.href = 'home_page.html'; 
-
-                } catch (error) {
-                    alert(`Erro ao criar conta: ${error.message}`);
-                    button.disabled = false;
-                    button.textContent = 'Inscrever-se';
-                }
-            });
-        </script>
-    </body>
-
+</body>
 </html>
-
-
-
-

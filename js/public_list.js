@@ -1,12 +1,15 @@
-// js/public_list.js
+/* === IMPORTAÇÕES DO FIREBASE === */
+import { db } from './firebase-config.js';
+import { 
+    collection, getDocs, query, where, doc, getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// URL da API (deve ser o caminho completo)
-const API_URL = 'https://oneg-6x4j.onrender.com/api';
+// URL Segura para Avatar Padrão
+const DEFAULT_PROFILE_PIC = "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=128";
 
 // Variáveis globais
 let items = [];
-let mangas = [];
-let categories = [];
+let originalItems = []; 
 
 // Elementos DOM
 const itemsContainer = document.getElementById('itemsContainer');
@@ -16,59 +19,112 @@ const searchInput = document.getElementById('searchInput');
 const mangaFilterContainer = document.getElementById('mangaFilterContainer');
 const mangaFilter = document.getElementById('mangaFilter');
 const listTitle = document.getElementById('public-list-title');
-const publicProfilePic = document.getElementById('public-profile-pic'); // <-- NOVO SELETOR
+const publicProfilePic = document.getElementById('public-profile-pic');
+const totalValueSpan = document.getElementById('totalValue');
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    if (itemsContainer) {
-        initializeApp();
-        
-        // Listeners dos filtros
-        categoryFilter.addEventListener('change', handleCategoryFilterChange);
-        statusFilter.addEventListener('change', renderItems);
-        searchInput.addEventListener('input', renderItems);
-        mangaFilter.addEventListener('change', renderItems);
-    }
+    initializeApp();
+    
+    categoryFilter.addEventListener('change', handleCategoryFilterChange);
+    statusFilter.addEventListener('change', renderItems);
+    searchInput.addEventListener('input', renderItems);
+    mangaFilter.addEventListener('change', renderItems);
 });
 
-// Função principal de carregamento
 async function initializeApp() {
     try {
-        // Pega o nome de usuário da URL (ex: ?user=eduardo)
-        const username = new URLSearchParams(window.location.search).get('user');
+        const params = new URLSearchParams(window.location.search);
+        const username = params.get('user');
         
         if (!username) {
-            listTitle.textContent = 'Erro: Nenhum perfil especificado.';
+            itemsContainer.innerHTML = '<p style="color:white; text-align:center;">Erro: Nenhum usuário especificado na URL.</p>';
+            listTitle.textContent = 'Usuário não encontrado';
             return;
         }
 
-        // Busca os dados públicos do usuário
-        const data = await fetch(`${API_URL}/users/public-list/${username}`);
-        const publicData = await data.json();
+        // Busca o usuário
+        const usersRef = collection(db, "users");
+        const qUser = query(usersRef, where("username", "==", username));
+        const userSnapshot = await getDocs(qUser);
 
-        if (!data.ok) {
-            throw new Error(publicData.message);
+        if (userSnapshot.empty) {
+            itemsContainer.innerHTML = '<p style="color:white; text-align:center;">Este usuário não existe ou não tem uma lista pública.</p>';
+            listTitle.textContent = 'Usuário não encontrado';
+            return;
         }
 
-        // Preenche as variáveis globais
-        listTitle.textContent = `Lista de Presentes de ${publicData.user.username}`;
-        publicProfilePic.src = publicData.user.profilePicture; // <-- NOVA LINHA
-        items = publicData.items || [];
-        categories = publicData.categories || [];
-        mangas = publicData.mangas || [];
+        const userDoc = userSnapshot.docs[0];
+        const userData = userDoc.data();
+        const targetUid = userDoc.id; // UID real do usuário (ou userDoc.data().uid)
 
-        // Renderiza tudo
-        populateCategoryFilters();
-        populateMangaFilters();
-        renderItems();
+        // Verifica privacidade
+        if (userData.isPublic === false) {
+            itemsContainer.innerHTML = '<p style="color:white; text-align:center;">Esta lista é privada.</p>';
+            listTitle.textContent = 'Lista Privada';
+            return;
+        }
+
+        // --- CORREÇÃO DA IMAGEM ---
+        let pic = userData.profilePicture;
+        
+        // Verifica se a imagem do banco é a "quebrada" ou inválida
+        const isInvalid = !pic || 
+                          pic.includes("PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+") || 
+                          pic.length > 1000000;
+
+        if (isInvalid) {
+            // Gera avatar com a inicial do nome do usuário da lista
+            pic = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username || 'User')}&background=0D8ABC&color=fff&size=128`;
+        }
+
+        publicProfilePic.src = pic;
+        listTitle.textContent = userData.listTitle || `Lista de ${userData.username}`;
+
+        // Busca Itens
+        const itemsRef = collection(db, "items");
+        const qItems = query(itemsRef, where("userId", "==", targetUid)); // Usa o ID do documento encontrado
+        const itemsSnapshot = await getDocs(qItems);
+
+        items = [];
+        itemsSnapshot.forEach((doc) => {
+            items.push({ _id: doc.id, ...doc.data() });
+        });
+        originalItems = [...items];
+
+        if (items.length === 0) {
+            itemsContainer.innerHTML = '<p style="color:white; text-align:center;">Esta lista está vazia.</p>';
+        } else {
+            populateFiltersFromItems(items);
+            renderItems();
+        }
 
     } catch (error) {
-        console.error('Erro ao inicializar a aplicação:', error);
-        listTitle.textContent = `Erro: ${error.message}`;
+        console.error('Erro:', error);
+        itemsContainer.innerHTML = `<p style="color:white; text-align:center;">Erro ao carregar lista: ${error.message}</p>`;
     }
 }
 
-// Filtro de Categoria (igual ao script_homepage)
+function populateFiltersFromItems(itemsList) {
+    const categories = new Set();
+    const mangas = new Set();
+
+    itemsList.forEach(item => {
+        if(item.category) categories.add(item.category);
+        if(item.work) mangas.add(item.work);
+    });
+
+    categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
+    categories.forEach(cat => {
+        categoryFilter.add(new Option(cat, cat));
+    });
+
+    mangaFilter.innerHTML = '<option value="">Todos os mangás</option>';
+    mangas.forEach(m => {
+        mangaFilter.add(new Option(m, m));
+    });
+}
+
 function handleCategoryFilterChange() {
     if (this.value === 'Mangás') {
         mangaFilterContainer.classList.remove('hidden');
@@ -79,7 +135,6 @@ function handleCategoryFilterChange() {
     renderItems();
 }
 
-// *** FUNÇÃO RENDERITEMS (SOMENTE LEITURA) ***
 function renderItems() {
     const category = categoryFilter.value;
     const status = statusFilter.value;
@@ -95,8 +150,7 @@ function renderItems() {
         const matchesSearch = 
             (item.name && item.name.toLowerCase().includes(searchTerm)) ||
             (item.work && item.work.toLowerCase().includes(searchTerm)) ||
-            (item.category && item.category.toLowerCase().includes(searchTerm)) ||
-            (item.notes && item.notes.toLowerCase().includes(searchTerm));
+            (item.category && item.category.toLowerCase().includes(searchTerm));
         const matchesManga = manga === '' || item.work === manga;
         
         return matchesCategory && matchesStatus && matchesSearch && matchesManga;
@@ -104,58 +158,43 @@ function renderItems() {
     
     itemsContainer.innerHTML = '';
     
+    let total = 0;
+
     filteredItems.forEach(item => {
+        if (!item.purchased) {
+            total += parseFloat(item.price || 0);
+        }
+
         const itemCard = document.createElement('div');
-        const itemId = item._id; 
         itemCard.className = `item-card ${item.purchased ? 'comprado' : ''}`;
         
+        const imgHtml = item.image 
+            ? `<img src="${item.image}" alt="${item.name}" class="item-image">`
+            : `<div class="item-image" style="background-color: #ecf0f1; display: flex; align-items: center; justify-content: center;"><span>Sem imagem</span></div>`;
+
         itemCard.innerHTML = `
-            ${item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image">` : 
-              `<div class="item-image" style="background-color: #ecf0f1; display: flex; align-items: center; justify-content: center;">
-                 <span>Sem imagem</span>
-               </div>`}
+            ${imgHtml}
             <div class="item-details">
                 <h3 class="item-title">${item.name}</h3>
-                <div class="item-price">R$ ${item.price ? item.price.toFixed(2) : '0.00'}</div>
+                <div class="item-price">R$ ${parseFloat(item.price || 0).toFixed(2)}</div>
                 <div>
                     <span class="item-category">${item.category}</span>
                     ${item.work ? `<span class="item-work">${item.work}</span>` : ''}
                 </div>
                 <p>${item.platform ? `Plataforma: ${item.platform}` : ''}</p>
-                ${item.notes ? `<p>${item.notes}</p>` : ''}
+                ${item.notes ? `<p style="font-size:0.9em; margin-top:5px; color:#666;">📝 ${item.notes}</p>` : ''}
+                
                 <div class="item-actions">
                     <div class="item-link-container">
-                        ${item.link ? `<a href="${item.link}" target="_blank" class="item-link">Ver produto</a>` : 
-                                      `<span>Sem link</span>`}
+                        ${item.link ? `<a href="${item.link}" target="_blank" class="item-link">Ver produto</a>` : `<span>Sem link</span>`}
                     </div>
                 </div>
             </div>
         `;
-        
         itemsContainer.appendChild(itemCard);
     });
+
+    if (totalValueSpan) {
+        totalValueSpan.textContent = total.toFixed(2);
+    }
 }
-
-// Popula Filtros de Categoria
-function populateCategoryFilters() {
-    categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
-    categories.forEach(category => {
-        const option1 = document.createElement('option');
-        option1.value = category;
-        option1.textContent = category;
-        categoryFilter.appendChild(option1);
-    });
-}
-
-// Popula Filtros de Mangá
-function populateMangaFilters() {
-    mangaFilter.innerHTML = '<option value="">Todos os mangás</option>';
-    mangas.forEach(manga => {
-        const option1 = document.createElement('option');
-        option1.value = manga;
-        option1.textContent = manga;
-        mangaFilter.appendChild(option1);
-    });
-
-}
-

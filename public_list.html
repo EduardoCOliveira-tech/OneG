@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>OneG: Lista Pública</title>
     
     <link rel="stylesheet" href="css/style_home_page.css"> 
     <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        /* Ajuste específico para esconder controles de edição na lista pública */
+        .action-buttons { display: none !important; }
+        .sidebar-menu-button { display: none; }
+        .total { margin-top: 20px; color: white; font-weight: bold; text-align: right; }
+    </style>
 </head>
 <body style="background: linear-gradient( 90deg, #00bba5, #427f8f);">
 
-    <main class="content-area" style="margin-left: 0;">
+    <main class="content-area" style="margin-left: 0; width: 100%;">
         
         <div class="container">
             <header>
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYy0yLjc2IDAtNSA-Mi4yNCAtNSA-NXMvMi4yNCAtNSA1IC01IDUgMi4yNCA1IDUgLTIuMjQgNSAtNSA1em0wIDJjMi42NyAwIDggMS4zNCA4IDR2Mkg0di0yYzAtMi42NiA1LjMzIC00IDggLTR6Ii8+PC9zdmc+" alt="Foto de Perfil" id="public-profile-pic">
-                <h1 id="public-list-title">Carregando lista de presentes...</h1>
+                <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=128" alt="Foto de Perfil" id="public-profile-pic" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid white; object-fit: cover;">
+                <h1 id="public-list-title">Carregando lista...</h1>
             </header>
             
             <div class="controls">
@@ -43,13 +48,17 @@
             </div>
             
             <div class="items-grid" id="itemsContainer">
-                </div>
+                <p style="color: white; text-align: center; width: 100%;">Buscando itens...</p>
+            </div>
+            
+            <div class="total">
+                Total estimado: R$ <span id="totalValue">0.00</span>
+            </div>
             
         </div>
     </main>
     
-    <script src="js/public_list.js"></script>
+    <script type="module" src="js/public_list.js"></script>
   
 </body>
-
 </html>

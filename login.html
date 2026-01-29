@@ -1,85 +1,78 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>OneG: Login</title> <link rel="stylesheet" href="css/criar_conta.css">
-        <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
-    </head>
-    <body>
-        <main>
-            <div class="wrapper">
-                <form id="login-form">
-                    <h2>Login</h2>
-                        <div class="entrada">
-                        <input type="email" id="email" required>
-                        <label>Email</label>
-                    </div>
-                    <div class="entrada">
-                        <input type="password" id="password" required>
-                        <label>Senha</label>
-                    </div>
-                    <div class="esqueceu">
-                        <label for="lembrar">
-                            <input type="checkbox" id="lembrar">
-                            <p>Lembrar</p>
-                        </label>
-                        <a href="esqueceu_a_senha.html">Esqueceu a senha?</a>
-                    </div>
-                    <button type="submit">log In</button>
-                    <div class="registrar">
-                        <p>Não tem uma conta? <a 
-                        href="criar_conta.html">Registrar</a></p>
-                    </div>
-                </form>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - OneG</title>
+    <link rel="stylesheet" href="css/telaum_style.css">
+    <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
+</head>
+<body class="auth-body">
+    
+    <main class="container">
+        <div class="auth-box">
+            <a href="index.html" class="back-home">
+                <span>←</span> Voltar para o início
+            </a>
+            <h2>Bem-vindo de volta!</h2>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </form>
+
+            <div class="switch-page">
+                Ainda não tem uma conta? 
+                <a href="criar_conta.html">Crie agora</a>
             </div>
-        </main>
+        </div>
+    </main>
 
-        <script>
-            const API_URL = 'https://oneg-6x4j.onrender.com/api'; 
+    <script type="module">
+        import { auth } from './js/firebase-config.js';
+        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-            const loginForm = document.getElementById('login-form');
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); 
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            
+            // Feedback visual de carregamento
+            btn.textContent = 'Entrando...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // Se der certo, redireciona
+                window.location.href = 'home_page.html';
+            } catch (error) {
+                // Tratamento de erros comuns
+                let msg = 'Erro ao entrar.';
+                if (error.code === 'auth/invalid-credential') msg = 'E-mail ou senha incorretos.';
+                else if (error.code === 'auth/user-not-found') msg = 'Usuário não encontrado.';
+                else if (error.code === 'auth/wrong-password') msg = 'Senha incorreta.';
+                else msg = error.message;
 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const button = loginForm.querySelector('button');
-                button.disabled = true;
-                button.textContent = 'Entrando...';
-
-                try {
-                    const response = await fetch(`${API_URL}/auth/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password }),
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Credenciais inválidas.');
-                    }
-
-                    // --- MUDANÇA AQUI ---
-                    localStorage.setItem('authToken', data.token); // Salva o token
-                    // Salva os dados do usuário para a home_page usar
-                    localStorage.setItem('userData', JSON.stringify(data.user)); 
-                    // --- FIM DA MUDANÇA ---
-                    
-                    window.location.href = 'home_page.html'; 
-
-                } catch (error) {
-                    alert(`Erro ao fazer login: ${error.message}`);
-                    button.disabled = false;
-                    button.textContent = 'log In';
-                }
-            });
-        </script>
-    </body>
+                alert(msg);
+                
+                // Restaura o botão
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        });
+    </script>
+    
+</body>
 </html>
-
-
-

@@ -1,20 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OneG: Sua página de presentes</title>
-    <link rel="stylesheet" href="css/telaum_style.css"> 
+    <title>OneG: Organize seus Desejos</title>
+    <link rel="stylesheet" href="css/telaum_style.css">
     <link rel="website icon" type="png" href="IMG/Smartwall-2.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
         <div class="container">
             <a href="#" class="logo">OneG</a>
-            <nav>
+            <nav class="nav-links">
                 <a href="login.html" class="nav-link">Entrar</a>
-                <a href="criar_conta.html" class="btn-primary">Criar Conta</a>
+                <a href="criar_conta.html" class="btn btn-primary">Criar Conta</a>
             </nav>
         </div>
     </header>
@@ -22,23 +22,22 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Suas Listas de Presentes, <br>Perfeitas e <span class="highlight">Compartilháveis</span></h1>
+                <h1>Sua Wishlist,<br>Reinventada.</h1>
                 <p class="subtitle">
-                    Organize seus presentes desejados, customize seu perfil e compartilhe 
-                    suas listas com amigos e família de forma fácil e segura.
+                    Organize jogos, mangás e presentes em um só lugar. 
+                    Compartilhe com amigos e acabe com as dúvidas na hora de presentear.
                 </p>
                 <div class="hero-buttons">
-                    <a href="criar_conta.html" class="btn-primary">Começar Agora</a>
-                    <a href="login.html" class="btn-secondary">Já tenho Conta</a>
+                    <a href="criar_conta.html" class="btn btn-primary">Criar Minha Lista</a>
+                    <a href="login.html" class="btn btn-secondary">Já tenho conta</a>
                 </div>
 
                 <div class="profile-search">
-                    <h3>Ou procure por uma lista pública</h3>
+                    <h3>🔍 Procurar lista de amigo</h3>
                     <form class="search-form" id="profile-search-form">
-                        <input type="text" id="search-query" placeholder="Digite o nome de usuário ou email..." required>
-                        <button type="submit" class="btn-primary">Buscar</button>
+                        <input type="text" id="search-query" placeholder="Digite o usuário ex: eduardo..." required>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
                     </form>
-                    
                     <div id="search-results-container"></div>
                 </div>
             </div>
@@ -46,86 +45,72 @@
 
         <section class="features">
             <div class="container">
-                <h2>Funcionalidades Principais</h2>
+                <h2>O que você pode fazer?</h2>
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="icon-wrapper">🎁</div>
-                        <h3>Crie suas Listas</h3>
-                        <p>Organize seus presentes em categorias personalizadas</p>
+                        <span class="icon">🎮</span>
+                        <h3>Organize Tudo</h3>
+                        <p>Jogos, colecionáveis ou roupas. Crie categorias e mantenha tudo sob controle.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="icon-wrapper">🔗</div>
-                        <h3>Compartilhe Facilmente</h3>
-                        <p>Gere links únicos para compartilhar com amigos e família</p>
+                        <span class="icon">🔗</span>
+                        <h3>Compartilhável</h3>
+                        <p>Um link único para o seu perfil público. Envie para quem quiser.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="icon-wrapper">👀</div>
-                        <h3>Veja Listas Alheias</h3>
-                        <p>Acesse listas de outras pessoas via link compartilhado</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="icon-wrapper">🎨</div>
-                        <h3>Customize seu Perfil</h3>
-                        <p>Personalize cores, tema escuro e foto de perfil</p>
+                        <span class="icon">🚀</span>
+                        <h3>Ultra Rápido</h3>
+                        <p>Sincronização instantânea e acesso imediato.</p>
                     </div>
                 </div>
             </div>
         </section>
-
-        <section class="cta">
-            <div class="container">
-                <h2>Pronto para começar?</h2>
-                <p>Crie sua conta e comece a organizar suas listas de presentes hoje mesmo!</p>
-                <a href="criar_conta.html" class="btn-primary">Criar Conta Grátis</a>
-            </div>
-        </section>
     </main>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 Gift Registry. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <script>
-        const API_URL = 'https://oneg-6x4j.onrender.com/api'; 
         const searchForm = document.getElementById('profile-search-form');
         const resultsContainer = document.getElementById('search-results-container');
 
         searchForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const query = document.getElementById('search-query').value;
-            resultsContainer.innerHTML = '<p>Buscando...</p>'; // Mostra feedback
+            const term = document.getElementById('search-query').value.trim();
+            if(!term) return;
+            
+            resultsContainer.innerHTML = '<p style="color:#666; margin-top:10px;">Buscando...</p>';
 
             try {
-                // Chama a nova rota de busca
-                const response = await fetch(`${API_URL}/users/search?q=${query}`);
-                const profiles = await response.json();
-
-                if (!response.ok) {
-                  throw new Error(profiles.message);
+                // Busca no Firestore por usuário
+                const usersRef = collection(db, "users");
+                // Nota: O Firestore não tem busca textual nativa robusta (LIKE %...%). 
+                // Usamos "==" para exato ou ">=" e "<=" para prefixo. Vamos usar exato para simplificar ou prefixo.
+                const q = query(usersRef, where("username", "==", term), where("isPublic", "==", true));
+                
+                const querySnapshot = await getDocs(q);
+                
+                resultsContainer.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    resultsContainer.innerHTML = '<p>Nenhum usuário público encontrado.</p>';
+                    return;
                 }
 
-                if (profiles.length === 0) {
-                  resultsContainer.innerHTML = '<p>Nenhum perfil público encontrado.</p>';
-                  return;
-                }
-
-                // Limpa o container e adiciona os links
-                resultsContainer.innerHTML = '<h4>Perfis encontrados:</h4>';
-                profiles.forEach(profile => {
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
                     const link = document.createElement('a');
-                    link.href = `public_list.html?user=${profile.username}`;
-                    link.textContent = profile.username;
-                    link.target = "_blank"; // Abre em nova aba
-                    link.classList.add('profile-link'); // Adiciona classe para estilização
+                    link.href = `public_list.html?user=${userData.username}`;
+                    link.textContent = `@${userData.username}`;
+                    link.className = 'profile-link';
+                    link.target = "_blank";
                     resultsContainer.appendChild(link);
                 });
-                
+
             } catch (error) {
-                resultsContainer.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+                console.error(error);
+                resultsContainer.innerHTML = '<p>Erro na busca.</p>';
             }
         });
     </script>
 </body>
-</html>
