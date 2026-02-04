@@ -312,6 +312,9 @@ function renderItems() {
                     ${item.work ? `<span class="item-work">${item.work}</span>` : ''}
                 </div>
                 <p>${item.platform ? `Plataforma: ${item.platform}` : ''}</p>
+                
+                ${item.notes ? `<p class="item-notes">📝 ${item.notes}</p>` : ''}
+
                 <div class="item-actions">
                     <div class="item-link-container">
                         ${item.link ? `<a href="${item.link}" target="_blank" class="item-link">Ver produto</a>` : `<span>Sem link</span>`}

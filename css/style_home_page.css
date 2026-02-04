@@ -571,6 +571,27 @@ select, input[type="text"], input[type="password"], input[type="number"], input[
     transition: transform 0.3s ease;
     transform: scale(1.1);
 }
+
+/* Estilo das observações no card */
+.item-notes {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-style: italic;
+    background-color: rgba(0,0,0,0.03); /* Fundo leve para destacar */
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-left: 3px solid #00bba5; /* Detalhe verde na lateral */
+    word-break: break-word; /* Evita que textos longos estourem o card */
+}
+
+/* Ajuste para o Modo Escuro */
+body.dark-mode .item-notes {
+    color: #ccc;
+    background-color: rgba(255,255,255,0.05);
+}
+
  .action-buttons {
     display: flex;
     flex-wrap: wrap;
